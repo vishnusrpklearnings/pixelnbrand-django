@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hero_title|default:"Digital Marketing Agency in Kerala" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/services.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>{{ hero_title }}</h1>
+                <p>{{ hero_description }}</p>
+                <a href="#contact" class="btn">{{ hero_button_text }}</a>
+            </div>
+            <div class="hero-image">
+                {% if site_settings.hero_image %}
+                    <img src="{{ site_settings.hero_image.url }}" alt="{{ hero_title }}">
+                {% else %}
+                    <img src="{% static 'images/hero-image.jpg' %}" alt="Digital Marketing Team Collaboration">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Include Services Section -->
+{% include 'services/services_section.html' with services=services services_title=services_title services_description=services_description %}
+
+<!-- Testimonials Section -->
+<section class="testimonials" id="testimonials">
+    <div class="container">
+        <div class="section-title">
+            <h2>{{ testimonials_title }}</h2>
+            <p>{{ testimonials_description }}</p>
+        </div>
+        
+        <div class="testimonial-slider">
+            {% for testimonial in testimonials %}
+            <div class="testimonial-slide {% if forloop.first %}active{% endif %}" id="slide{{ forloop.counter }}">
+                <p class="testimonial-text">"{{ testimonial.content }}"</p>
+                <p class="testimonial-author">- {{ testimonial.client_name }}{% if testimonial.company %}, {{ testimonial.company }}{% endif %}</p>
+            </div>
+            {% endfor %}
+            
+            <div class="slider-controls">
+                <button class="slider-btn prev-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="slider-btn next-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="slider-dots">
+                {% for testimonial in testimonials %}
+                <span class="dot {% if forloop.first %}active{% endif %}" data-slide="{{ forloop.counter0 }}"></span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Portfolio Section -->
+<section class="portfolio" id="portfolio">
+    <div class="container">
+        <div class="section-title">
+            <h2>{{ portfolio_title }}</h2>
+            <p>{{ portfolio_description }}</p>
+        </div>
+        
+        <div class="portfolio-grid">
+            {% for item in portfolio_items %}
+            <div class="portfolio-item">
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                {% else %}
+                    <img src="{% static 'images/placeholder.svg' %}" alt="{{ item.title }}">
+                {% endif %}
+                <div class="portfolio-overlay">
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.category }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section" id="cta">
+    <div class="container">
+        <h2>{{ cta_title }}</h2>
+        <p>{{ cta_description }}</p>
+        <a href="#contact" class="btn btn-secondary">{{ cta_button_text }}</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/services.js' %}"></script>
+
+<!-- Testimonial Slider Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('.testimonial-slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    let currentSlide = 0;
+    
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        currentSlide = (n + slides.length) % slides.length;
+        
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
+    
+    if (prevBtn && slides.length > 0) {
+        prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+    }
+    
+    if (nextBtn && slides.length > 0) {
+        nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+    }
+    
+    if (dots.length > 0) {
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => showSlide(index));
+        });
+    }
+    
+    // Auto slide if there are testimonials
+    if (slides.length > 1) {
+        setInterval(() => showSlide(currentSlide + 1), 5000);
+    }
+});
+</script>
+{% endblock %}

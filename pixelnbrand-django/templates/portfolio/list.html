@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Portfolio | {{ site_settings.company_name }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Our Portfolio</h1>
+        <p>Explore our portfolio of successful digital marketing projects and brand transformations.</p>
+    </div>
+</section>
+
+<section class="portfolio-section">
+    <div class="container">
+        <!-- Category Filter -->
+        <div class="portfolio-filter">
+            <button class="filter-btn active" data-filter="all">All</button>
+            {% for category in categories %}
+            <button class="filter-btn" data-filter="{{ category }}">{{ category }}</button>
+            {% endfor %}
+        </div>
+
+        <!-- Portfolio Grid -->
+        <div class="portfolio-grid">
+            {% for item in portfolio_items %}
+            <div class="portfolio-item" data-category="{{ item.category }}">
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                {% else %}
+                    <img src="{% static 'images/placeholder.svg' %}" alt="{{ item.title }}">
+                {% endif %}
+                <div class="portfolio-overlay">
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.category }}</p>
+                    <!-- Updated link to go to detail page -->
+                    <a href="{% url 'portfolio_detail' item.slug %}" class="portfolio-link">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

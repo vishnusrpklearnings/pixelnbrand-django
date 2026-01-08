@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.get_meta_title }} | {{ site_settings.company_name }}{% endblock %}
+
+{% block meta_description %}{{ service.get_meta_description }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Service Detail Header */
+    .service-detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 120px 0 80px;
+        margin-top: 80px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-detail-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{% static 'images/pattern.png' %}") repeat;
+        opacity: 0.1;
+        pointer-events: none;
+    }
+    
+    .service-detail-header .container {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+    }
+    
+    .service-icon-large {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 3px solid white;
+    }
+    
+    .service-icon-large img {
+        max-width: 70px;
+        max-height: 70px;
+        object-fit: contain;
+    }
+    
+    .service-icon-large i {
+        font-size: 50px;
+        color: white;
+    }
+    
+    .service-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-align: center;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .service-subtitle {
+        font-size: 1.3rem;
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        opacity: 0.9;
+        font-weight: 300;
+        line-height: 1.6;
+    }
+    
+    /* Service Content */
+    .service-content-section {
+        padding: 80px 0;
+        background: #f8f9fa;
+    }
+    
+    .service-content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .service-featured-image {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 15px;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    /* Service Details Grid */
+    .service-details-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 50px;
+        margin-bottom: 60px;
+    }
+    
+    @media (max-width: 992px) {
+        .service-details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Main Content */
+    .service-main-content {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .service-main-content h2 {
+        color: #333;
+        margin: 30px 0 20px;
+        font-size: 2rem;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .service-main-content h2:first-child {
+        margin-top: 0;
+    }
+    
+    .service-main-content h3 {
+        color: #444;
+        margin: 25px 0 15px;
+        font-size: 1.5rem;
+    }
+    
+    .service-main-content p {
+        line-height: 1.8;
+        margin-bottom: 20px;
+        color: #555;
+    }
+    
+    .service-main-content ul,
+    .service-main-content ol {
+        margin-bottom: 20px;
+        padding-left: 25px;
+    }
+    
+    .service-main-content li {
+        margin-bottom: 10px;
+        line-height: 1.6;
+        color: #555;
+    }
+    
+    /* Sidebar */
+    .service-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .info-card h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .info-card h3 i {
+        color: #667eea;
+    }
+    
+    .features-list,
+    .benefits-list,
+    .process-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .features-list li,
+    .benefits-list li,
+    .process-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 15px;
+        color: #555;
+        line-height: 1.5;
+    }
+    
+    .features-list li i,
+    .benefits-list li i,
+    .process-list li i {
+        color: #4CAF50;
+        font-size: 1.1rem;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    
+    /* Process steps numbering */
+    .process-list li {
+        counter-increment: step-counter;
+        position: relative;
+        padding-left: 35px;
+    }
+    
+    .process-list li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 25px;
+        height: 25px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    /* Pricing Section */
+    .pricing-section {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        margin-top: 50px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .pricing-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 40px;
+        font-size: 2.2rem;
+    }
+    
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    
+    .pricing-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .pricing-card.featured {
+        background: white;
+        border-color: #667eea;
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+    }
+    
+    .pricing-card h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+    }
+    
+    .price {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 20px;
+    }
+    
+    .price span {
+        font-size: 1rem;
+        color: #666;
+    }
+    
+    .pricing-features {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0 30px;
+    }
+    
+    .pricing-features li {
+        margin-bottom: 10px;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .pricing-features li i {
+        color: #4CAF50;
+    }
+    
+    /* CTA Section */
+    .service-cta {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 0;
+        margin-top: 80px;
+        text-align: center;
+        border-radius: 15px;
+    }
+    
+    .service-cta h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .service-cta p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        opacity: 0.9;
+    }
+    
+    /* Related Services */
+    .related-services {
+        margin-top: 80px;
+        padding-top: 60px;
+        border-top: 1px solid #eee;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    
+    .section-title h2 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .section-title p {
+        color: #666;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .service-detail-header {
+            padding: 80px 0 50px;
+            margin-top: 60px;
+        }
+        
+        .service-title {
+            font-size: 2.5rem;
+        }
+        
+        .service-subtitle {
+            font-size: 1.1rem;
+            padding: 0 15px;
+        }
+        
+        .service-icon-large {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .service-icon-large img {
+            max-width: 50px;
+            max-height: 50px;
+        }
+        
+        .service-icon-large i {
+            font-size: 40px;
+        }
+        
+        .service-featured-image {
+            height: 300px;
+        }
+        
+        .service-main-content,
+        .info-card,
+        .pricing-section {
+            padding: 25px;
+        }
+        
+        .pricing-card.featured {
+            transform: none;
+        }
+        
+        .service-cta {
+            padding: 50px 20px;
+            margin: 50px 15px 0;
+            border-radius: 10px;
+        }
+        
+        .service-cta h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Service Detail Header -->
+<section class="service-detail-header">
+    <div class="container">
+        <div class="service-icon-large">
+            {% if service.icon_image %}
+                <img src="{{ service.icon_image.url }}" alt="{{ service.title }} icon">
+            {% elif service.icon %}
+                <i class="{{ service.icon }}"></i>
+            {% else %}
+                <i class="fas fa-cog"></i>
+            {% endif %}
+        </div>
+        
+        <h1 class="service-title">{{ service.title }}</h1>
+        
+        {% if service.short_description %}
+        <p class="service-subtitle">{{ service.short_description }}</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Service Content -->
+<section class="service-content-section">
+    <div class="service-content-wrapper">
+        {% if service.featured_image %}
+        <img src="{{ service.featured_image.url }}" 
+             alt="{{ service.title }}" 
+             class="service-featured-image">
+        {% endif %}
+        
+        <div class="service-details-grid">
+            <!-- Main Content -->
+            <div class="service-main-content">
+                {% if service.description %}
+                <div class="service-description">
+                    {{ service.description|safe }}
+                </div>
+                {% endif %}
+                
+                {% if service.detailed_content %}
+                <div class="service-detailed-content">
+                    {{ service.detailed_content|safe }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="service-sidebar">
+                <!-- Key Features -->
+                {% if service.get_key_features_list %}
+                <div class="info-card">
+                    <h3><i class="fas fa-star"></i> Key Features</h3>
+                    <ul class="features-list">
+                        {% for feature in service.get_key_features_list %}
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ feature }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Benefits -->
+                {% if service.get_benefits_list %}
+                <div class="info-card">
+                    <h3><i class="fas fa-award"></i> Benefits</h3>
+                    <ul class="benefits-list">
+                        {% for benefit in service.get_benefits_list %}
+                        <li>
+                            <i class="fas fa-check"></i>
+                            <span>{{ benefit }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Our Process -->
+                {% if service.get_process_list %}
+                <div class="info-card">
+                    <h3><i class="fas fa-list-ol"></i> Our Process</h3>
+                    <ol class="process-list" style="counter-reset: step-counter;">
+                        {% for step in service.get_process_list %}
+                        <li>{{ step }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Pricing Section -->
+        {% if service.has_pricing %}
+        <div class="pricing-section">
+            <h2 class="pricing-title">Pricing Plans</h2>
+            <div class="pricing-grid">
+                {% if service.basic_price %}
+                <div class="pricing-card">
+                    <h3>Basic</h3>
+                    <div class="price">₹{{ service.basic_price }}<span>/month</span></div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Basic Features</li>
+                        <li><i class="fas fa-check"></i> Email Support</li>
+                        <li><i class="fas fa-check"></i> Monthly Reports</li>
+                    </ul>
+                    <a href="{% url 'contact' %}?service={{ service.title|urlencode }}&plan=Basic" 
+                       class="btn" style="background: #667eea; color: white;">
+                        Get Started
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if service.premium_price %}
+                <div class="pricing-card featured">
+                    <h3>Premium</h3>
+                    <div class="price">₹{{ service.premium_price }}<span>/month</span></div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> All Basic Features</li>
+                        <li><i class="fas fa-check"></i> Priority Support</li>
+                        <li><i class="fas fa-check"></i> Weekly Reports</li>
+                        <li><i class="fas fa-check"></i> Advanced Analytics</li>
+                    </ul>
+                    <a href="{% url 'contact' %}?service={{ service.title|urlencode }}&plan=Premium" 
+                       class="btn" style="background: #667eea; color: white;">
+                        Get Started
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if service.enterprise_price %}
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">₹{{ service.enterprise_price }}<span>/month</span></div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> All Premium Features</li>
+                        <li><i class="fas fa-check"></i> 24/7 Support</li>
+                        <li><i class="fas fa-check"></i> Custom Solutions</li>
+                        <li><i class="fas fa-check"></i> Dedicated Account Manager</li>
+                    </ul>
+                    <a href="{% url 'contact' %}?service={{ service.title|urlencode }}&plan=Enterprise" 
+                       class="btn" style="background: #667eea; color: white;">
+                        Contact Sales
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Call to Action -->
+        <div class="service-cta">
+            <h2>Ready to Get Started?</h2>
+            <p>Let's discuss how {{ service.title }} can help grow your business. Schedule a free consultation with our experts.</p>
+            <a href="{% url 'contact' %}?service={{ service.title|urlencode }}" class="btn btn-lg" style="background: white; color: #667eea;">
+                <i class="fas fa-calendar-check me-2"></i> Schedule Free Consultation
+            </a>
+        </div>
+        
+        <!-- Related Services -->
+        {% if related_services %}
+        <div class="related-services">
+            <div class="section-title">
+                <h2>Related Services</h2>
+                <p>Explore other services that might interest you</p>
+            </div>
+            
+            <div class="services-grid">
+                {% for related in related_services %}
+                <div class="service-card">
+                    <div class="service-icon">
+                        {% if related.icon_image %}
+                            <img src="{{ related.icon_image.url }}" 
+                                 alt="{{ related.title }} icon" 
+                                 class="service-icon-image">
+                        {% elif related.icon %}
+                            <i class="{{ related.icon }}"></i>
+                        {% else %}
+                            <i class="fas fa-cog"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <h3>{{ related.title }}</h3>
+                    
+                    <div class="service-description">
+                        {{ related.short_description|default:related.description|striptags|truncatewords:30 }}
+                    </div>
+                    
+                    <a href="{% url 'detail' related.slug %}" class="service-modal-btn">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!-- templates/services/services_section.html -->
+{% load static %}
+
+<!-- Services Section -->
+<section class="services-section" id="services">
+    <div class="container">
+        <div class="section-title">
+            <h2>{{ services_title }}</h2>
+            <p>{{ services_description }}</p>
+        </div>
+        
+        <div class="services-grid">
+            {% for service in services %}
+            <div class="service-card" data-service-id="{{ service.id }}">
+                <div class="service-icon">
+                    {% if service.icon_image %}
+                        <img src="{{ service.icon_image.url }}" 
+                             alt="{{ service.title }} icon" 
+                             class="service-icon-image">
+                    {% elif service.icon %}
+                        <i class="{{ service.icon }}"></i>
+                    {% else %}
+                        <i class="fas fa-cog"></i>
+                    {% endif %}
+                </div>
+                
+                <h3>{{ service.title }}</h3>
+                
+                <!-- FIXED: Remove |striptags filter to show HTML properly -->
+                <div class="service-description">
+                    {{ service.description|safe }}
+                </div>
+                
+                {% if service.detailed_content %}
+                <button class="service-modal-btn" onclick="openServiceModal('{{ service.id }}')">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </button>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="no-services" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <p style="color: #666; font-size: 18px;">No services available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- More Services Button -->
+        {% if services|length > 6 or total_services > 6 %}
+        <div class="text-center mt-5">
+            <a href="{% url 'service_list' %}" class="more-services-btn">
+                <i class="fas fa-plus-circle"></i> View All Services
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Service Modals -->
+{% for service in services %}
+{% if service.detailed_content %}
+<div class="service-modal" id="modal-{{ service.id }}">
+    <div class="service-modal-content">
+        <button class="modal-close" onclick="closeServiceModal('{{ service.id }}')">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="modal-icon">
+            {% if service.icon_image %}
+                <img src="{{ service.icon_image.url }}" alt="{{ service.title }} icon">
+            {% elif service.icon %}
+                <i class="{{ service.icon }}"></i>
+            {% else %}
+                <i class="fas fa-cog"></i>
+            {% endif %}
+        </div>
+        
+        <h2 class="modal-title">{{ service.title }}</h2>
+        
+        <!-- FIXED: Remove |striptags filter -->
+        <div class="modal-description">
+            {{ service.description|safe }}
+        </div>
+        
+        <div class="modal-content">
+            {{ service.detailed_content|safe }}
+        </div>
+        
+        <div class="modal-cta">
+            <a href="#contact" class="btn btn-primary" onclick="closeServiceModal('{{ service.id }}')">
+                <i class="fas fa-calendar-check me-2"></i> Get This Service
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
